@@ -24,9 +24,7 @@ To run this project, enter: `npm start`.
 
 ## Future work
 There are some important TODOs to this project:
-
-[  ] Finishing the `/projects` routes
-
-[  ] Finishing the unit tests
-
-[  ] Figuring out how to create encrypted passwords and authetications for users
+- [ ] Finishing the `/projects` routes
+- [ ] Finishing the unit tests
+- [ ] Figuring out how to create encrypted passwords and authetications for users
+- [ ] Adding automatic Swagger
