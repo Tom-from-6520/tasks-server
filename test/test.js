@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 
 const User = require('../app/models/users.js');
+const Project = require('../app/models/projects.js');
 
 //Require the dev-dependencies
 const chai = require('chai');
@@ -11,11 +12,10 @@ const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Testing all APIs', () => {
-    const testUser = { userId: 'dung.doan', name: 'Doan Dung', pass: '123456' };
+    let testUser = new User({ userId: 'dung.doan', name: 'Doan Dung', pass: '123456' });
+    let testProject = new Project({ name: 'Task server', content: 'Build a complete task managing server', users: [] });
     beforeEach((done) => {
-        User.deleteMany({}, (err) => { done(); });
-        let user = new User(testUser);
-        user.save();
+        setupTestDatabase(done, testUser, testProject);
     });
 
     describe('Testing /users APIs', () => {
@@ -170,6 +170,81 @@ describe('Testing all APIs', () => {
 
     });
 
+    describe('Testing /projects APIs', () => {
+        it('should GET all the projects', (done) => {
+            chai.request(server)
+                .get('/projects')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('array');
+                    res.body.length.should.be.eql(1);
+                    done();
+                });
+        });
+
+        it('should POST a new project', (done) => {
+            const newProject = {
+                name: 'Creating Gant charts',
+                content: 'Creating Gant charts to provide visualizations of work progress',
+                users: [ {userId: 'dung.doan', roles: ['developer']} ],
+            };
+            chai.request(server)
+                .post('/projects')
+                .send(newProject)
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('_id');
+                    res.body.should.have.property('name').eql('Creating Gant charts');
+                    res.body.should.have.property('users');
+                    res.body.should.have.property('budget');
+                    done();
+                });
+        });
+
+        it('should NOT POST a new project without a name', (done) => {
+            const newProject = {
+                content: 'Creating Gant charts to provide visualizations of work progress',
+            };
+            chai.request(server)
+                .post('/projects')
+                .send(newProject)
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should GET a project given correct id', (done) => {
+            chai.request(server)
+                .get('/projects/' + testProject._id)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('_id').eql(testProject.id);
+                    res.body.should.have.property('name').eql('Task server');
+                    res.body.should.have.property('taskIds').eql([]);
+                    done();
+                });
+        });
+
+
+    });
 
 
 });
+
+function setupTestDatabase(done, testUser, testProject) {
+    User.deleteMany({}, (err) => {
+        if(err)  done();
+    });
+    let user = new User(testUser)
+    user.save();
+
+    Project.deleteMany({}, (err) => {
+        if(err)  done();
+    });
+    let project = new Project(testProject)
+    project.save();
+    done();
+}
