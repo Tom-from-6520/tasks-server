@@ -7,8 +7,8 @@ const UserSchema = new Schema(
         name: {type: String, required: true},
         DOB: {type: Date, default: Date.now},
         pass: {type: String, required: true}, //TODO update later
-        projectIds: [Schema.Types.ObjectId],
-        taskIds: [Schema.Types.ObjectId]
+        projectIds: [String],
+        taskIds: [String]
     },
     {
         versionKey: false
