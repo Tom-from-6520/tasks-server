@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const user = require('./app/routes/users.js');
+const project = require('./app/routes/projects.js');
 const port = 8080;
 let config;
 
