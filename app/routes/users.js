@@ -1,4 +1,5 @@
 const User = require('../models/users.js');
+const Project = require('../models/projects.js');
 
 /**
  * GET /users retrieve all the users
@@ -46,7 +47,7 @@ function deleteUser(req, res, next) {
 }
 
 /**
- * PUT /users/:id update 
+ * PUT /users/:id update an user given its id
  */
 function updateUser(req, res, next) {
     if(req.body.userId || req.body.projectIds || req.body.taskIds)  return res.status(400).send();
