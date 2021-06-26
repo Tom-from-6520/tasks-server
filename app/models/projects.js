@@ -9,7 +9,7 @@ const ProjectSchema = new Schema(
         deadline: {type: Date},
         completed: {type: Boolean, default: false},
         budget: {type: Number, min: 0, default: 0},
-        projectUsers: [{
+        users: [{
             userId: {type: String, required: true},
             roles: [String],
             taskIds:[String]
