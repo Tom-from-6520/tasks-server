@@ -553,7 +553,7 @@
 									"    pm.expect(response).to.be.an(\"array\");\r",
 									"\r",
 									"    if(response.length > 0) {\r",
-									"        pm.collectionVariables.set(\"projectId\", response[0]._id);\r",
+									"        pm.collectionVariables.set(\"projectId0\", response[0]._id);\r",
 									"    }\r",
 									"});"
 								],
@@ -571,6 +571,92 @@
 							],
 							"path": [
 								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects/completed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is full of completed projects\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.be.an(\"array\");\r",
+									"    for(let i = 0; i < response.length; i++) {\r",
+									"        pm.expect(response[i].completed).to.be.eql(true);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/completed",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								"completed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects/incomplete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is full of completed projects\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.be.an(\"array\");\r",
+									"    for(let i = 0; i < response.length; i++) {\r",
+									"        pm.expect(response[i].completed).to.be.eql(false);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/incomplete",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								"incomplete"
 							]
 						}
 					},
@@ -1186,6 +1272,158 @@
 								{
 									"key": "id",
 									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects/:id/users/:index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userId).to.be.a(\"string\");\r",
+									"    pm.expect(response.roles).to.be.a(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/:id/users/:index",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id",
+								"users",
+								":index"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								},
+								{
+									"key": "index",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /projects/:id/users/:index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/:id/users/:index",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id",
+								"users",
+								":index"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								},
+								{
+									"key": "index",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /users/:id user0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all properties in right format\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.a(\"string\");\r",
+									"    pm.expect(response.pass).to.be.a(\"string\");\r",
+									"    pm.expect(response.DOB).to.be.a(\"string\");\r",
+									"    pm.expect(response.projectIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response don't have the previous projectId\", function() {\r",
+									"    const prevProjectId = pm.collectionVariables.get(\"projectId0\");\r",
+									"    pm.expect(pm.response.json().projectIds).to.not.include(prevProjectId);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/users/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{userId1}}"
 								}
 							]
 						}
