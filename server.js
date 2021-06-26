@@ -37,6 +37,9 @@ app.route('/projects')
     .get(project.getProjects)
     .post(project.createNewProject);
 
+app.get('/projects/completed', project.getCompletedProjects);
+app.get('/projects/incomplete', project.getIncompleteProjects);
+
 app.route('/projects/:id')
     .get(project.getProject)
     .delete(project.deleteProject)
@@ -46,6 +49,10 @@ app.route('/projects/:id/users')
     .get(project.getUsers)
     .post(project.includeUser);
 
+app.route('/projects/:id/users/:index')
+    .get(project.getUser)
+    .delete(project.deleteUser);
+//     .put(project.updateUser);  //TODO: make these two functions
 
 app.listen(port);
 console.log("Listening on port " + port);
