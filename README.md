@@ -16,11 +16,12 @@ To install all dependecies of the project, enter the following bash lines:
 $ cd ../[install_folder]
 $ npm install
 ```
-The files `dev.json` and `test.json` inside folder `config` have to be modified into host's MongoDB URI.
+The file `config.json` have to be modified into host's MongoDB URI. Make sure to delete the old `projects` and `users` collections in the database to give the server a fresh start.
 
-After installation and modification, to test this project, simply enter: `npm test`.
+After installation and modification, to test this project, enter `npm start` to run the server, then enter: `npm test` to run the postman API tests.
 
-To run this project, enter: `npm start`.
+## Update log
+Version 1.1 include new tests created from Postman and run by newman package. This version also eliminate the `userId` in `users` database.
 
 ## Future work
 There are some important TODOs to this project:
