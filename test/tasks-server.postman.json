@@ -428,6 +428,112 @@
 			"name": "/projects",
 			"item": [
 				{
+					"name": "POST /users userId0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all properties\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.eql(\"new user 0\");\r",
+									"    pm.expect(response.pass).to.eql(\"218218\");\r",
+									"    pm.expect(response.projectIds).to.eql([]);\r",
+									"    pm.expect(response.taskIds).to.eql([]);\r",
+									"    \r",
+									"    pm.collectionVariables.set(\"userId0\", response._id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"new user 0\",\r\n    \"pass\": \"218218\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/users",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /users userId1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all properties\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.eql(\"new user 1\");\r",
+									"    pm.expect(response.pass).to.eql(\"218218\");\r",
+									"    pm.expect(response.projectIds).to.eql([]);\r",
+									"    pm.expect(response.taskIds).to.eql([]);\r",
+									"    \r",
+									"    pm.collectionVariables.set(\"userId1\", response._id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"new user 1\",\r\n    \"pass\": \"218218\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/users",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET /projects",
 					"event": [
 						{
@@ -492,11 +598,14 @@
 									"    pm.expect(response.dayStart).to.be.a(\"string\");\r",
 									"    pm.expect(response.budget).to.be.a(\"number\");\r",
 									"    pm.expect(response.completed).to.be.a(\"boolean\");\r",
-									"    pm.expect(response.projectUsers).to.be.an(\"array\");\r",
-									"    pm.expect(response.projectUsers.length).to.be.eql(1);\r",
+									"    pm.expect(response.users).to.be.an(\"array\");\r",
 									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
 									"    \r",
-									"    pm.collectionVariables.set(\"projectId\", response._id);\r",
+									"    pm.collectionVariables.set(\"projectId0\", response._id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response have the user\", function() {\r",
+									"    pm.expect(pm.response.json().users.length).to.be.eql(1);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -508,7 +617,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Creating Gant charts\",\r\n    \"content\": \"Creating Gant charts to provide visualizations of work progress\",\r\n    \"projectUsers\": [ { \"userId\": \"{{userId}}\", \"roles\": [\"developer\"] } ]\r\n}",
+							"raw": "{\r\n    \"name\": \"Creating Gant charts\",\r\n    \"content\": \"Creating Gant charts to provide visualizations of work progress\",\r\n    \"users\": [ { \"userId\": \"{{userId0}}\", \"roles\": [\"developer\"] } ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -547,7 +656,67 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Creating Gant charts\",\r\n    \"content\": \"Creating Gant charts to provide visualizations of work progress\",\r\n    \"projectUsers\": [ { \"roles\": [\"developer\"] } ]\r\n}",
+							"raw": "{\r\n    \"name\": \"Creating Gant charts\",\r\n    \"content\": \"Creating Gant charts to provide visualizations of work progress\",\r\n    \"users\": [ { \"roles\": [\"developer\"] } ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/projects",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /projects with incorrect userId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all project properties\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.eql(\"Creating Gant charts\");\r",
+									"    pm.expect(response.content).to.be.eql(\"Creating Gant charts to provide visualizations of work progress\");\r",
+									"    pm.expect(response.dayStart).to.be.a(\"string\");\r",
+									"    pm.expect(response.budget).to.be.a(\"number\");\r",
+									"    pm.expect(response.completed).to.be.a(\"boolean\");\r",
+									"    pm.expect(response.users).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"    \r",
+									"    pm.collectionVariables.set(\"projectId1\", response._id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response don't have the incorrect user\", function() {\r",
+									"    pm.expect(pm.response.json().users.length).to.be.eql(0);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Creating Gant charts\",\r\n    \"content\": \"Creating Gant charts to provide visualizations of work progress\",\r\n    \"users\": [ { \"userId\": \"{{incorrectId}}\", \"roles\": [\"developer\"] } ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -588,7 +757,7 @@
 									"    pm.expect(response.dayStart).to.be.a(\"string\");\r",
 									"    pm.expect(response.budget).to.be.a(\"number\");\r",
 									"    pm.expect(response.completed).to.be.a(\"boolean\");\r",
-									"    pm.expect(response.projectUsers).to.be.an(\"array\");\r",
+									"    pm.expect(response.users).to.be.an(\"array\");\r",
 									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
 									"});"
 								],
@@ -611,7 +780,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{projectId}}"
+									"value": "{{projectId0}}"
 								}
 							]
 						}
@@ -649,6 +818,485 @@
 								{
 									"key": "id",
 									"value": "{{incorrectId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /projects/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all project properties\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.a(\"string\");\r",
+									"    pm.expect(response.content).to.be.a(\"string\");\r",
+									"    pm.expect(response.dayStart).to.be.a(\"string\");\r",
+									"    pm.expect(response.budget).to.be.a(\"number\");\r",
+									"    pm.expect(response.completed).to.be.a(\"boolean\");\r",
+									"    pm.expect(response.users).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"    \r",
+									"    pm.collectionVariables.set(\"projectId\", response._id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has the change\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.eql(\"Building task managing server\");\r",
+									"    pm.expect(response.content).to.be.eql(\"Building a complete task managing server\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Building task managing server\",\r\n    \"content\": \"Building a complete task managing server\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/projects/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT PUT /projects/:id with taskIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Building task managing server\",\r\n    \"content\": \"Building a complete task managing server\",\r\n    \"taskIds\": [ \"some taskId\" ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/projects/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /projects/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects/:id/users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.be.an(\"array\");\r",
+									"\r",
+									"    if(response.length > 0) {\r",
+									"        pm.collectionVariables.set(\"projectUserId\", response[0].userId);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/:id/users",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id",
+								"users"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /projects/:id/users but update existing user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a new project user\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userId).to.be.eql(pm.collectionVariables.get(\"userId0\"));\r",
+									"    pm.expect(response.roles).to.be.a(\"array\");\r",
+									"    pm.expect(response.roles.length).to.be.eql(2);\r",
+									"    pm.expect(response.taskIds).to.be.eql([]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": \"{{userId0}}\",\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/projects/:id/users",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id",
+								"users"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /projects/:id/users create new project user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a new project user\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userId).to.be.eql(pm.collectionVariables.get(\"userId1\"));\r",
+									"    pm.expect(response.roles).to.be.a(\"array\");\r",
+									"    pm.expect(response.roles.length).to.be.eql(1);\r",
+									"    pm.expect(response.taskIds).to.be.eql([]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": \"{{userId1}}\",\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/projects/:id/users",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id",
+								"users"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT POST /projects/:id/users without userId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/projects/:id/users",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id",
+								"users"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /users/:id userId0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/users/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{userId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /users/:id userId1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/users/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{userId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /projects/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/projects/:id",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
 								}
 							]
 						}
@@ -692,8 +1340,28 @@
 			"value": ""
 		},
 		{
+			"key": "projectUserId",
+			"value": ""
+		},
+		{
 			"key": "incorrectId",
 			"value": "incorrectvclvcl"
+		},
+		{
+			"key": "userId1",
+			"value": ""
+		},
+		{
+			"key": "userId0",
+			"value": ""
+		},
+		{
+			"key": "projectId0",
+			"value": ""
+		},
+		{
+			"key": "projectId1",
+			"value": ""
 		}
 	]
 }
