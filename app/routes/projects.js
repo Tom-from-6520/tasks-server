@@ -18,21 +18,21 @@ function getProjects(req, res, next) {
  function createNewProject(req, res, next) {
     const newProject = new Project(req.body);
     newProject.save((err, project) => {
-        if(err)  return res.status(400).send();
+        if(err)  return res.status(400).send(err);
 
-        //update to users
-        //TODO rethink this structure
-        let faultyEntry = [];
-        project.users.forEach((projectUser) => {
-            User.findOne({userId: projectUser.userId}, (err, user) => {
-                if(!err) {
-                    user.projectIds.push('' + project.id);
-                    user.save();
-                }
-                else  return res.status(500).send();
-            });
-        });
-        project.users = project.users.filter(user => !faultyEntry.includes(user));
+        // //update to users
+        // //TODO rethink this structure
+        // let faultyEntry = [];
+        // project.users.forEach((projectUser) => {
+        //     User.findOne({userId: projectUser.userId}, (err, user) => {
+        //         if(!err) {
+        //             user.projectIds.push('' + project.id);
+        //             user.save();
+        //         }
+        //         else  return res.status(500).send();
+        //     });
+        // });
+        // project.users = project.users.filter(user => !faultyEntry.includes(user));
 
         res.status(201).json(project);
     });
@@ -120,4 +120,4 @@ function includeUser(req, res, next) {
     });
 }
 
-module.exports = { getProjects, createNewProject, getProject, deleteProject, updateProject, getUsers, includeUser };
+module.exports = { getProjects, createNewProject, getProject, /*deleteProject, updateProject, getUsers, includeUser*/ };
