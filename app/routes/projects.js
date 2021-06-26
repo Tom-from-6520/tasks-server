@@ -17,23 +17,14 @@ function getProjects(req, res, next) {
  */
  function createNewProject(req, res, next) {
     const newProject = new Project(req.body);
+
+    let users = [].concat(newProject.users);
+    users.forEach(projectUser => {
+        updateUserDB(projectUser.userId, newProject);
+    });
+
     newProject.save((err, project) => {
         if(err)  return res.status(400).send(err);
-
-        // //update to users
-        // //TODO rethink this structure
-        // let faultyEntry = [];
-        // project.users.forEach((projectUser) => {
-        //     User.findOne({userId: projectUser.userId}, (err, user) => {
-        //         if(!err) {
-        //             user.projectIds.push('' + project.id);
-        //             user.save();
-        //         }
-        //         else  return res.status(500).send();
-        //     });
-        // });
-        // project.users = project.users.filter(user => !faultyEntry.includes(user));
-
         res.status(201).json(project);
     });
 }
@@ -52,11 +43,18 @@ function getProject(req, res, next) {
  * DELETE /projects/:id delete a project given its id
  */
 function deleteProject(req, res, next) {
+    Project.findById(req.params.id, (err, project) => {
+        if(!err && project) {
+            let users = [].concat(project.users);
+            users.forEach(projectUser => {
+                updateUserDB(projectUser.userId, project, projectUser.taskIds, true);
+            });
+            //TODO: delete the record of the project in tasks databases
+        }
+    });
+
     Project.deleteOne({_id: req.params.id}, (err, result) => {
         if(err)  return res.status(404).send();
-        
-        //TODO: delete the record of the project in users and tasks databases
-
         res.status(204).json(result);
     });
 }
@@ -94,30 +92,64 @@ function getUsers(req, res, next) {
  */
 function includeUser(req, res, next) {
     const userId = req.body && req.body.userId;
-    let savedUser;
-    User.findOne({userId: userId}, (err, user) => {
+    User.findById(userId, (err, user) => {
         if(err || !userId || !user)  return res.status(400).send();
-        savedUser = user;
-    });
 
-    Project.findById(req.params.id, (err, project) => {
-        if(err || !project)  return res.status(404).send();
-        
-        const newProjectUser = {
-            userId: userId,
-            roles: req.body.roles,
-            taskIds: req.body.taskIds
-        }
-        project.users.push(newProjectUser);
-        project.save((err, project) => {
-            if(err)   return res.status(500).send();
+        Project.findById(req.params.id, (err, project) => {
+            if(err || !project)  return res.status(404).send();
+            
+            updateUserDB(userId, project.id, req.body.taskIds);
+
+            //TODO: update tasks database
+
+            const userIndex = project.users.findIndex(user => user.userId === userId);
+            console.log(userIndex);
+            if(userIndex === -1) {
+                console.log('ec');
+                const newProjectUser = {
+                    userId: userId,
+                    roles: req.body.roles,
+                    taskIds: req.body.taskIds
+                }
+                project.users.push(newProjectUser);
+                project.save((err, project) => {
+                    if(err)   return res.status(500).send();
+                    res.status(201).json(newProjectUser);
+                });
+            }
+            else {
+                console.log('ec ec');
+                projectUser = project.users[userIndex];
+                projectUser.roles = projectUser.roles.concat(req.body.roles);
+                projectUser.taskIds = projectUser.taskIds.concat(req.body.taskIds);
+                project.save((err, project) => {
+                    if(err)   return res.status(500).send();
+                    res.status(200).json(projectUser);
+                });
+            }
         });
-
-        //TODO update projectId and taskIds to savedUser
-        savedUser.projectIds.push(project.id);
-
-        res.status(200).json(newProjectUser);
     });
 }
 
-module.exports = { getProjects, createNewProject, getProject, /*deleteProject, updateProject, getUsers, includeUser*/ };
+module.exports = { getProjects, createNewProject, getProject, deleteProject, updateProject, getUsers, includeUser };
+
+//helper functions
+function updateUserDB(userId, project, taskIds=[], toDelete=false) {
+    User.findById(userId, (err, user) => {
+        if(!err && user) {
+            if(toDelete) {
+                user.projectIds = user.projectIds.filter(id => id !== project.id);
+                user.save();
+            }
+            else {
+                user.projectIds.push('' + project.id);
+                // user.taskIds = user.taskIds.concat(taskIds);
+                user.save();
+            }
+        }
+        else {
+            const index = project.users.findIndex(projectUser => projectUser.userId === userId);
+            project.users.splice(index, 1);
+        }
+    });
+}

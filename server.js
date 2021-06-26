@@ -35,16 +35,16 @@ app.route('/users/:id/projects')
 
 app.route('/projects')
     .get(project.getProjects)
-    .post(project.createNewProject); //TODO: pick up from here
+    .post(project.createNewProject);
 
 app.route('/projects/:id')
-    .get(project.getProject);
-    // .delete(project.deleteProject)
-    // .put(project.updateProject);
+    .get(project.getProject)
+    .delete(project.deleteProject)
+    .put(project.updateProject);
 
-// app.route('/projects/:id/users')
-//     .get(project.getUsers)
-//     .post(project.includeUser);
+app.route('/projects/:id/users')
+    .get(project.getUsers)
+    .post(project.includeUser);
 
 
 app.listen(port);
