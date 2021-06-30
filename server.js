@@ -51,8 +51,8 @@ app.route('/projects/:id/users')
 
 app.route('/projects/:id/users/:index')
     .get(project.getUser)
-    .delete(project.deleteUser);
-//     .put(project.updateUser);  //TODO: make these two functions
+    .delete(project.deleteUser)
+    .put(project.updateUser);
 
 app.listen(port);
 console.log("Listening on port " + port);
