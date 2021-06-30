@@ -21,6 +21,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.text());
 app.use(express.json({ type: 'application/json'}));
 
+// /users routes
 app.route('/users')
     .get(user.getUsers)
     .post(user.createNewUser);
@@ -32,11 +33,13 @@ app.route('/users/:id')
 
 app.route('/users/:id/projects')
     .get(user.getProjects);
+app.get('/users/:id/projects/incomplete', user.getIncompleteProjects);
+app.get('/users/:id/projects/completed', user.getCompletedProjects);
 
+// /projects routes
 app.route('/projects')
     .get(project.getProjects)
     .post(project.createNewProject);
-
 app.get('/projects/completed', project.getCompletedProjects);
 app.get('/projects/incomplete', project.getIncompleteProjects);
 
