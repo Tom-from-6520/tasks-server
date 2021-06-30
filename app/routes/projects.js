@@ -54,18 +54,18 @@ function getProject(req, res, next) {
  */
 function deleteProject(req, res, next) {
     Project.findById(req.params.id, (err, project) => {
-        if(!err && project) {
-            let users = [].concat(project.users);
-            users.forEach(projectUser => {
-                updateUserDB(projectUser.userId, project, projectUser.taskIds, true);
-            });
-            //TODO: delete the record of the project in tasks databases
-        }
-    });
+        if(err || !project)  return res.status(404).send();
 
-    Project.deleteOne({_id: req.params.id}, (err, result) => {
-        if(err)  return res.status(404).send();
-        res.status(204).json(result);
+        let users = [].concat(project.users);
+        users.forEach(projectUser => {
+            updateUserDB(projectUser.userId, project, projectUser.taskIds, true);
+        });
+        //TODO: delete the record of the project in tasks databases
+
+        Project.deleteOne({_id: req.params.id}, (err, result) => {
+            if(err)  return res.status(500).send();
+            res.status(204).json(result);
+        });
     });
 }
 
@@ -108,7 +108,7 @@ function includeUser(req, res, next) {
         Project.findById(req.params.id, (err, project) => {
             if(err || !project)  return res.status(404).send();
             
-            updateUserDB(userId, project.id, req.body.taskIds);
+            updateUserDB(userId, project, req.body.taskIds);
 
             //TODO: update tasks database
 
@@ -159,7 +159,7 @@ function deleteUser(req, res, next) {
         if(err || !project)  return res.status(404).send();
         if(index < 0 || index >= project.users.length)  return res.status(404).send();
         
-        updateUserDB(project.users[index].userId, project.id, project.users[index].taskIds, true);
+        updateUserDB(project.users[index].userId, project, project.users[index].taskIds, true);
 
         project.users.splice(index, 1);
         project.save((err, project) => {
@@ -169,8 +169,28 @@ function deleteUser(req, res, next) {
     });
 }
 
+/**
+ * PUT /projects/:id/users/:index update for the project user users[index]
+ */
+function updateUser(req, res, next) {
+    if(req.body.userId)  return res.status(400).send();
+    const index = parseInt(req.params.index);
+    Project.findById(req.params.id, (err, project) => {
+        if(err || !project)  return res.status(404).send();
+        if(index < 0 || index >= project.users.length)  return res.status(404).send();
+
+        Object.assign(project.users[index], req.body);
+        //TODO update any change of the taskIds
+
+        project.save((err, project) => {
+            if(err)  return res.status(500).send();
+            res.status(200).json(project.users[index]);
+        });
+    });
+}
+
 module.exports = { getProjects, getCompletedProjects, getIncompleteProjects, createNewProject, getProject, deleteProject, updateProject, getUsers, includeUser,
-                    getUser, deleteUser, /*updateUser*/ };
+                    getUser, deleteUser, updateUser };
 
 //helper functions
 /**
