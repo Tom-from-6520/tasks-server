@@ -58,7 +58,7 @@ function createTask(req, res, next) {
             }
             else {
                 projectUser = project.users[userIndex];
-                projectUser.taskIds = projectUser.taskIds.push(newTask.id);
+                projectUser.taskIds.push(newTask.id);
                 project.save();
                 newTask.save((err, task) => {
                     if(err)   return res.status(500).send();
@@ -66,10 +66,27 @@ function createTask(req, res, next) {
                 });
             }
         });
+        if(newTask.userIds.length == 0) {
+            project.save();
+            newTask.save((err, task) => {
+                if(err)   return res.status(500).send();
+                res.status(201).json(task);
+            });
+        }
     });
 }
 
-module.exports = { getTasks, getIncompleteTasks, getCompletedTasks, createTask };
+/**
+ * GET /tasks/:id retrieve a task given the id
+ */
+function getTask(req, res, next) {
+    Task.findById(req.params.id, (err, task) => {
+        if(err || !task)  return res.status(404).send();
+        res.status(200).json(task);
+    });
+}
+
+module.exports = { getTasks, getIncompleteTasks, getCompletedTasks, createTask, getTask };
 
 //helper functions
 /**
