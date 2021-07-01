@@ -1868,6 +1868,68 @@
 					"response": []
 				},
 				{
+					"name": "POST new task to project0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a new project task\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.eql(\"test server\");\r",
+									"    pm.expect(response.content).to.be.eql(\"test the weak af server\");\r",
+									"    pm.expect(response.projectId).to.be.eql(pm.collectionVariables.get(\"projectId0\"));\r",
+									"    pm.expect(response.userIds).to.be.a(\"array\");\r",
+									"    pm.expect(response.userIds.length).to.be.eql(1);\r",
+									"    pm.expect(response.userIds[0]).to.be.eql(pm.collectionVariables.get(\"userId\"));\r",
+									"\r",
+									"    pm.collectionVariables.set(\"taskId\", response._id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test server\",\r\n    \"content\": \"test the weak af server\",\r\n    \"userIds\": \"{{userId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{projectsURL}}/:id/tasks",
+							"host": [
+								"{{projectsURL}}"
+							],
+							"path": [
+								":id",
+								"tasks"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "PUT a project given id",
 					"event": [
 						{
@@ -1910,7 +1972,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Building task managing server\",\r\n    \"content\": \"Building a complete task managing server\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Building task managing server\",\r\n    \"content\": \"Building a complete task managing server\",\r\n    \"completed\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1929,6 +1991,50 @@
 								{
 									"key": "id",
 									"value": "{{projectId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET test task completed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a completed task\", function() {\r",
+									"    pm.expect(pm.response.json().completed).to.be.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tasksURL}}/:id",
+							"host": [
+								"{{tasksURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{taskId}}"
 								}
 							]
 						}
@@ -2017,7 +2123,7 @@
 					"response": []
 				},
 				{
-					"name": "NOT GET deleted project",
+					"name": "NOT GET deleted test task",
 					"event": [
 						{
 							"listen": "test",
@@ -2035,9 +2141,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{projectsURL}}/:id",
+							"raw": "{{tasksURL}}/:id",
 							"host": [
-								"{{projectsURL}}"
+								"{{tasksURL}}"
 							],
 							"path": [
 								":id"
@@ -2045,7 +2151,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{projectId0}}"
+									"value": "{{taskId}}"
 								}
 							]
 						}
@@ -2287,25 +2393,29 @@
 					"response": []
 				},
 				{
-					"name": "GET all users of the project",
+					"name": "POST test task0 to project",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
 									"pm.test(\"The response is a json object\", function() {\r",
 									"    pm.response.to.be.json;\r",
 									"});\r",
 									"\r",
-									"pm.test(\"The response is an array containing only user0\", function() {\r",
+									"pm.test(\"The response is a new project task\", function() {\r",
 									"    const response = pm.response.json();\r",
-									"    pm.expect(response).to.be.an(\"array\");\r",
-									"    pm.expect(response.length).to.be.eql(1);\r",
-									"    pm.expect(response[0].userId).to.be.eql(pm.collectionVariables.get(\"userId0\"));\r",
+									"    pm.expect(response.name).to.be.eql(\"test server\");\r",
+									"    pm.expect(response.content).to.be.eql(\"test the weak af server\");\r",
+									"    pm.expect(response.projectId).to.be.eql(pm.collectionVariables.get(\"projectId\"));\r",
+									"    pm.expect(response.userIds).to.be.a(\"array\");\r",
+									"    pm.expect(response.userIds.length).to.be.eql(0);\r",
+									"\r",
+									"    pm.collectionVariables.set(\"taskId0\", response._id);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2313,16 +2423,25 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test server\",\r\n    \"content\": \"test the weak af server\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{projectsURL}}/:id/users",
+							"raw": "{{projectsURL}}/:id/tasks",
 							"host": [
 								"{{projectsURL}}"
 							],
 							"path": [
 								":id",
-								"users"
+								"tasks"
 							],
 							"variable": [
 								{
@@ -2354,7 +2473,8 @@
 									"    pm.expect(response.userId).to.be.eql(pm.collectionVariables.get(\"userId1\"));\r",
 									"    pm.expect(response.roles).to.be.a(\"array\");\r",
 									"    pm.expect(response.roles.length).to.be.eql(1);\r",
-									"    pm.expect(response.taskIds).to.be.eql([]);\r",
+									"    pm.expect(response.taskIds).to.be.a(\"array\");\r",
+									"    pm.expect(response.taskIds.length).to.be.eql(1);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2366,7 +2486,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\": \"{{userId1}}\",\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": []\r\n}",
+							"raw": "{\r\n    \"userId\": \"{{userId1}}\",\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": [\"{{taskId0}}\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2386,6 +2506,62 @@
 								{
 									"key": "id",
 									"value": "{{projectId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET user1 with project and task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all properties in right format\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.a(\"string\");\r",
+									"    pm.expect(response.pass).to.be.a(\"string\");\r",
+									"    pm.expect(response.DOB).to.be.a(\"string\");\r",
+									"    pm.expect(response.projectIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response have the projectId and taskId0\", function() {\r",
+									"    const projectId = pm.collectionVariables.get(\"projectId\");\r",
+									"    const taskId = pm.collectionVariables.get(\"taskId0\");\r",
+									"    pm.expect(pm.response.json().projectIds).to.include(projectId);\r",
+									"    pm.expect(pm.response.json().taskIds).to.include(taskId);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{usersURL}}/:id",
+							"host": [
+								"{{usersURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{userId1}}"
 								}
 							]
 						}
@@ -2470,7 +2646,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\": \"{{userId0}}\",\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": []\r\n}",
+							"raw": "{\r\n    \"userId\": \"{{userId0}}\",\r\n    \"roles\": [\"tester\"],\r\n    \"taskIds\": [\"{{incorrectId}}\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2547,59 +2723,6 @@
 					"response": []
 				},
 				{
-					"name": "GET a project user given index",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response is a json object\", function() {\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response is an array\", function() {\r",
-									"    const response = pm.response.json();\r",
-									"    pm.expect(response.userId).to.be.a(\"string\");\r",
-									"    pm.expect(response.roles).to.be.a(\"array\");\r",
-									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{projectsURL}}/:id/users/:index",
-							"host": [
-								"{{projectsURL}}"
-							],
-							"path": [
-								":id",
-								"users",
-								":index"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{projectId}}"
-								},
-								{
-									"key": "index",
-									"value": "0"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "NOT GET a project user given index of out range",
 					"event": [
 						{
@@ -2642,6 +2765,175 @@
 					"response": []
 				},
 				{
+					"name": "GET a project user given index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userId).to.be.a(\"string\");\r",
+									"    pm.expect(response.roles).to.be.a(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds.length).to.be.eql(0);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{projectsURL}}/:id/users/:index",
+							"host": [
+								"{{projectsURL}}"
+							],
+							"path": [
+								":id",
+								"users",
+								":index"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId}}"
+								},
+								{
+									"key": "index",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a project user given index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userId).to.be.a(\"string\");\r",
+									"    pm.expect(response.roles).to.be.a(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds.length).to.be.eql(1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{projectsURL}}/:id/users/:index",
+							"host": [
+								"{{projectsURL}}"
+							],
+							"path": [
+								":id",
+								"users",
+								":index"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId}}"
+								},
+								{
+									"key": "index",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST test task1 to project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a new project task\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.eql(\"fix server\");\r",
+									"    pm.expect(response.content).to.be.eql(\"fix the weak af server\");\r",
+									"    pm.expect(response.projectId).to.be.eql(pm.collectionVariables.get(\"projectId\"));\r",
+									"    pm.expect(response.userIds).to.be.a(\"array\");\r",
+									"    pm.expect(response.userIds.length).to.be.eql(0);\r",
+									"\r",
+									"    pm.collectionVariables.set(\"taskId1\", response._id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"fix server\",\r\n    \"content\": \"fix the weak af server\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{projectsURL}}/:id/tasks",
+							"host": [
+								"{{projectsURL}}"
+							],
+							"path": [
+								":id",
+								"tasks"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "PUT a project user given index",
 					"event": [
 						{
@@ -2661,6 +2953,7 @@
 									"    pm.expect(response.userId).to.be.a(\"string\");\r",
 									"    pm.expect(response.roles).to.be.a(\"array\");\r",
 									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds.length).to.be.eql(2);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2672,7 +2965,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"roles\": [\"project manager\"],\r\n    \"taskIds\": []\r\n}",
+							"raw": "{\r\n    \"roles\": [\"project manager\"],\r\n    \"taskIds\": [\"{{taskId0}}\", \"{{taskId1}}\", \"{{incorrectId}}\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2696,7 +2989,7 @@
 								},
 								{
 									"key": "index",
-									"value": "0"
+									"value": "1"
 								}
 							]
 						}
@@ -2806,6 +3099,338 @@
 					"response": []
 				},
 				{
+					"name": "GET a project user given index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userId).to.be.a(\"string\");\r",
+									"    pm.expect(response.roles).to.be.a(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds.length).to.be.eql(2);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{projectsURL}}/:id/users/:index",
+							"host": [
+								"{{projectsURL}}"
+							],
+							"path": [
+								":id",
+								"users",
+								":index"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId}}"
+								},
+								{
+									"key": "index",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET task0 with user1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userIds).to.include(pm.collectionVariables.get(\"userId1\"));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tasksURL}}/:id",
+							"host": [
+								"{{tasksURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{taskId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET task1 with user1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is an array\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.userIds).to.include(pm.collectionVariables.get(\"userId1\"));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tasksURL}}/:id",
+							"host": [
+								"{{tasksURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{taskId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a project user given index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{projectsURL}}/:id/users/:index",
+							"host": [
+								"{{projectsURL}}"
+							],
+							"path": [
+								":id",
+								"users",
+								":index"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{projectId}}"
+								},
+								{
+									"key": "index",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET user1 without project or task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response has all properties in right format\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.name).to.be.a(\"string\");\r",
+									"    pm.expect(response.pass).to.be.a(\"string\");\r",
+									"    pm.expect(response.DOB).to.be.a(\"string\");\r",
+									"    pm.expect(response.projectIds).to.be.an(\"array\");\r",
+									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response don't have the previous projectId\", function() {\r",
+									"    const prevProjectId = pm.collectionVariables.get(\"projectId\");\r",
+									"    const prevTaskId = pm.collectionVariables.get(\"taskId\");\r",
+									"    pm.expect(pm.response.json().projectIds).to.not.include(prevProjectId);\r",
+									"    pm.expect(pm.response.json().taskIds).to.not.include(prevTaskId);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{usersURL}}/:id",
+							"host": [
+								"{{usersURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{userId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET test task0 without user1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response does not include user1\", function() {\r",
+									"    const userId1 = pm.collectionVariables.get(\"userId1\")\r",
+									"    pm.expect(pm.response.json().userIds).to.not.include(userId1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tasksURL}}/:id",
+							"host": [
+								"{{tasksURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{taskId0}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET test task1 without user1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response is a json object\", function() {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response does not include user1\", function() {\r",
+									"    const userId1 = pm.collectionVariables.get(\"userId1\")\r",
+									"    pm.expect(pm.response.json().userIds).to.not.include(userId1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tasksURL}}/:id",
+							"host": [
+								"{{tasksURL}}"
+							],
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{taskId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET user0 with project id",
 					"event": [
 						{
@@ -2860,7 +3485,7 @@
 					"response": []
 				},
 				{
-					"name": "DELETE a project user given index",
+					"name": "DELETE the project",
 					"event": [
 						{
 							"listen": "test",
@@ -2878,23 +3503,17 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{projectsURL}}/:id/users/:index",
+							"raw": "{{projectsURL}}/:id",
 							"host": [
 								"{{projectsURL}}"
 							],
 							"path": [
-								":id",
-								"users",
-								":index"
+								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
 									"value": "{{projectId}}"
-								},
-								{
-									"key": "index",
-									"value": "0"
 								}
 							]
 						}
@@ -2949,150 +3568,6 @@
 								{
 									"key": "id",
 									"value": "{{userId0}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET user1 with project id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response is a json object\", function() {\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response has all properties in right format\", function() {\r",
-									"    const response = pm.response.json();\r",
-									"    pm.expect(response.name).to.be.a(\"string\");\r",
-									"    pm.expect(response.pass).to.be.a(\"string\");\r",
-									"    pm.expect(response.DOB).to.be.a(\"string\");\r",
-									"    pm.expect(response.projectIds).to.be.an(\"array\");\r",
-									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response have the previous projectId\", function() {\r",
-									"    const prevProjectId = pm.collectionVariables.get(\"projectId\");\r",
-									"    pm.expect(pm.response.json().projectIds).to.include(prevProjectId);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{usersURL}}/:id",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{userId1}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE the project",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 204\", function () {\r",
-									"    pm.response.to.have.status(204);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{projectsURL}}/:id",
-							"host": [
-								"{{projectsURL}}"
-							],
-							"path": [
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{projectId}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET user1 without project id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response is a json object\", function() {\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response has all properties in right format\", function() {\r",
-									"    const response = pm.response.json();\r",
-									"    pm.expect(response.name).to.be.a(\"string\");\r",
-									"    pm.expect(response.pass).to.be.a(\"string\");\r",
-									"    pm.expect(response.DOB).to.be.a(\"string\");\r",
-									"    pm.expect(response.projectIds).to.be.an(\"array\");\r",
-									"    pm.expect(response.taskIds).to.be.an(\"array\");\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The response don't have the previous projectId\", function() {\r",
-									"    const prevProjectId = pm.collectionVariables.get(\"projectId\");\r",
-									"    pm.expect(pm.response.json().projectIds).to.not.include(prevProjectId);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{usersURL}}/:id",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{userId1}}"
 								}
 							]
 						}
@@ -3822,6 +4297,10 @@
 			"value": "http://localhost:8080/projects"
 		},
 		{
+			"key": "tasksURL",
+			"value": "http://localhost:8080/tasks"
+		},
+		{
 			"key": "initialArrayLen",
 			"value": ""
 		},
@@ -3850,18 +4329,6 @@
 			"value": ""
 		},
 		{
-			"key": "incorrectId",
-			"value": "incorrectvclvcl"
-		},
-		{
-			"key": "initArrayLen",
-			"value": ""
-		},
-		{
-			"key": "projectUserId",
-			"value": ""
-		},
-		{
 			"key": "taskId",
 			"value": ""
 		},
@@ -3871,6 +4338,18 @@
 		},
 		{
 			"key": "taskId1",
+			"value": ""
+		},
+		{
+			"key": "initArrayLen",
+			"value": ""
+		},
+		{
+			"key": "incorrectId",
+			"value": "incorrectvclvcl"
+		},
+		{
+			"key": "projectUserId",
 			"value": ""
 		}
 	]
