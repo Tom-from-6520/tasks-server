@@ -1,5 +1,6 @@
 const User = require('../models/users.js');
 const Project = require('../models/projects.js');
+const Task = require('../models/tasks.js');
 
 /**
  * GET /users retrieve all the users
@@ -86,10 +87,36 @@ function getCompletedProjects(req, res, next) {
     getManyProjects(req, res);
 }
 
-module.exports = { getUsers, createNewUser, getUser, deleteUser, updateUser, getProjects, getIncompleteProjects, getCompletedProjects };
+/**
+ * GET /users/:id/projects retreieve all projects an user is working/has worked on
+ */
+ function getTasks(req, res, next) {
+    req.all = true;
+    getManyTasks(req, res);
+}
+
+/**
+ * GET /users/:id/projects/incomplete retrieve all incomplete projects an user is working on
+ */
+function getIncompleteTasks(req, res, next) {
+    req.all = false;
+    req.completed = false;
+    getManyTasks(req, res);
+}
+
+/**
+ * GET /users/:id/projects/completed retrieve all completed projects an user has worked on
+ */
+function getCompletedTasks(req, res, next) {
+    req.all = false;
+    req.completed = true;
+    getManyTasks(req, res);
+}
+
+module.exports = { getUsers, createNewUser, getUser, deleteUser, updateUser, getProjects, getIncompleteProjects, getCompletedProjects,
+                    getTasks, getIncompleteTasks, getCompletedTasks };
 
 //helper functions
-
 /**
  * retrieve all projects of user according to the request
  */
@@ -102,6 +129,23 @@ function getManyProjects(req, res) {
         else {
             Project.find({_id: user.projectIds, completed: req.completed}, (err, projects) => {
                 if(!err && projects)  res.status(200).json(projects.map(project => project.id));
+            });
+        }
+    });
+}
+
+/**
+ * retrieve all tasks of user according to the request
+ */
+ function getManyTasks(req, res) {
+    User.findById(req.params.id, (err, user) => {
+        if(err || !user)  return res.status(404).send();
+        if(req.all) {
+            res.status(200).json(user.taskIds);
+        }
+        else {
+            Task.find({_id: user.taskIds, completed: req.completed}, (err, tasks) => {
+                if(!err && tasks)  res.status(200).json(tasks.map(task => task.id));
             });
         }
     });
