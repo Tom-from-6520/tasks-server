@@ -1,25 +1,31 @@
 const Project = require('../models/projects.js');
 const User = require('../models/users.js');
+const Task = require('../models/tasks.js');
 
 /**
  * GET /projects retrieve all the projects
  */
 function getProjects(req, res, next) {
-    getManyProjects(res);
+    req.all = true;
+    getManyProjects(req, res);
 }
 
 /**
  * GET /projects/incomplete retrieve all completed projects
  */
  function getIncompleteProjects(req, res, next) {
-    getManyProjects(res, false);
+    req.all = false;
+    req.completed = false;
+    getManyProjects(req, res);
 }
 
 /**
  * GET /projects/completed retrieve all completed projects
  */
 function getCompletedProjects(req, res, next) {
-    getManyProjects(res, false, true);
+    req.all = false;
+    req.completed = true;
+    getManyProjects(req, res);
 }
 
 /**
@@ -28,9 +34,9 @@ function getCompletedProjects(req, res, next) {
  function createNewProject(req, res, next) {
     const newProject = new Project(req.body);
 
-    let users = [].concat(newProject.users);
-    users.forEach(projectUser => {
-        updateUserDB(projectUser.userId, newProject);
+    // let users = [].concat(newProject.users);
+    newProject.users.forEach(projectUser => {
+        updateProject2UserDB(projectUser.userId, newProject);
     });
 
     newProject.save((err, project) => {
@@ -57,14 +63,17 @@ function deleteProject(req, res, next) {
         if(err || !project)  return res.status(404).send();
 
         let users = [].concat(project.users);
+        let taskIds = [].concat(project.taskIds);
         users.forEach(projectUser => {
-            updateUserDB(projectUser.userId, project, projectUser.taskIds, true);
+            updateProject2UserDB(projectUser.userId, project, taskIds, true);
         });
-        //TODO: delete the record of the project in tasks databases
-
-        Project.deleteOne({_id: req.params.id}, (err, result) => {
+        
+        Task.deleteMany({_id: project.taskIds}, (err, result) => {
             if(err)  return res.status(500).send();
-            res.status(204).json(result);
+            Project.deleteOne({_id: req.params.id}, (err, result) => {
+                if(err)  return res.status(500).send();
+                res.status(204).send();
+            });
         });
     });
 }
@@ -108,7 +117,7 @@ function includeUser(req, res, next) {
         Project.findById(req.params.id, (err, project) => {
             if(err || !project)  return res.status(404).send();
             
-            updateUserDB(userId, project, req.body.taskIds);
+            updateProject2UserDB(userId, project, req.body.taskIds);
 
             //TODO: update tasks database
 
@@ -159,7 +168,8 @@ function deleteUser(req, res, next) {
         if(err || !project)  return res.status(404).send();
         if(index < 0 || index >= project.users.length)  return res.status(404).send();
         
-        updateUserDB(project.users[index].userId, project, project.users[index].taskIds, true);
+        updateProject2UserDB(project.users[index].userId, project, project.users[index].taskIds, true);
+        //TODO update changes to tasks DB
 
         project.users.splice(index, 1);
         project.save((err, project) => {
@@ -189,20 +199,46 @@ function updateUser(req, res, next) {
     });
 }
 
-module.exports = { getProjects, getCompletedProjects, getIncompleteProjects, createNewProject, getProject, deleteProject, updateProject, getUsers, includeUser,
-                    getUser, deleteUser, updateUser };
+/**
+ * GET /projects/:id/tasks retrieve all tasks of a project
+ */
+function getTasks(req, res, next) {
+    req.all = true;
+    getManyTasks(req, res);
+}
+
+/**
+ * GET /projects/:id/tasks/incomplete retrieve all incomplete tasks of a project
+ */
+ function getIncompleteTasks(req, res, next) {
+    req.all = false;
+    req.completed = false;
+    getManyTasks(req, res);
+}
+
+/**
+ * GET /projects/:id/tasks/completed retrieve all completed tasks of a project
+ */
+ function getCompletedTasks(req, res, next) {
+    req.all = false;
+    req.completed = true;
+    getManyTasks(req, res);
+}
+
+module.exports = { getProjects, getCompletedProjects, getIncompleteProjects, createNewProject, getProject, deleteProject, updateProject, 
+                    getUsers, includeUser, getUser, deleteUser, updateUser,
+                    getTasks, getIncompleteTasks, getCompletedTasks };
 
 //helper functions
 /**
- * Get the projects for many projects at once
- * @param {*}       res         the response of the route
- * @param {boolean} all         whether the response contain all projects
- * @param {boolean} completed   whether the response contain completed or incomplete projects
+ * Retrieve many projects at once
+ * @param {boolean} req.all         whether the response contain all projects
+ * @param {boolean} req.completed   whether the response contain completed or incomplete projects
  */
-function getManyProjects(res, all=true, completed=false) {
+function getManyProjects(req, res) {
     let query;
-    if(all)  query = Project.find({});
-    else  query = Project.find({completed: completed});
+    if(req.all)  query = Project.find({});
+    else  query = Project.find({completed: req.completed});
 
     query.exec((err, projects) => {
         if(err || !projects)  return res.status(404).send(err);
@@ -217,20 +253,39 @@ function getManyProjects(res, all=true, completed=false) {
  * @param {[string]}        taskIds     the array of taskId for update
  * @param {boolean}         toDelete    whether the update is deletion or insertion
  */
-function updateUserDB(userId, project, taskIds=[], toDelete=false) {
+function updateProject2UserDB(userId, project, taskIds=[], toDelete=false) {
     User.findById(userId, (err, user) => {
         if(!err && user && toDelete) {
             user.projectIds = user.projectIds.filter(id => id !== project.id);
+            user.taskIds = user.taskIds.filter(id => !taskIds.includes(id));
             user.save();
         }
         else if (!err && user && !toDelete) {
             user.projectIds.push('' + project.id);
-            // user.taskIds = user.taskIds.concat(taskIds);
+            user.taskIds = user.taskIds.concat(taskIds);
             user.save();
         }
         else if(!toDelete) {
-            const index = project.users.findIndex(projectUser => projectUser.userId === userId);
-            project.users.splice(index, 1);
+            project.users = project.users.filter(projectUser => projectUser.userId !== userId);
+        }
+    });
+}
+
+/**
+ * Retrieve the many tasks at once
+ * @param {boolean} req.all         whether the response contain all tasks
+ * @param {boolean} req.completed   whether the response contain completed or incomplete tasks
+ */
+ function getManyTasks(req, res) {
+    Project.findById(req.params.id, (err, project) => {
+        if(err || !project)  return res.status(404).send();
+        if(req.all) {
+            res.status(200).json(project.taskIds);
+        }
+        else {
+            Task.find({_id: project.taskIds, completed: req.completed}, (err, tasks) => {
+                if(!err && tasks)  res.status(200).json(tasks.map(task => task.id));
+            });
         }
     });
 }
