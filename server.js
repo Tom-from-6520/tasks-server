@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const user = require('./app/routes/users.js');
 const project = require('./app/routes/projects.js');
+const task = require('./app/routes/tasks.js');
 const port = 8080;
 const config = require('./config.json');
 
@@ -36,6 +37,10 @@ app.route('/users/:id/projects')
 app.get('/users/:id/projects/incomplete', user.getIncompleteProjects);
 app.get('/users/:id/projects/completed', user.getCompletedProjects);
 
+app.get('/users/:id/tasks', user.getTasks);
+app.get('/users/:id/tasks/incomplete', user.getIncompleteTasks);
+app.get('/users/:id/tasks/completed', user.getCompletedTasks);
+
 // /projects routes
 app.route('/projects')
     .get(project.getProjects)
@@ -56,6 +61,22 @@ app.route('/projects/:id/users/:index')
     .get(project.getUser)
     .delete(project.deleteUser)
     .put(project.updateUser);
+
+app.route('/projects/:id/tasks')
+    .get(project.getTasks)
+    .post(task.createTask);
+app.get('/projects/:id/tasks/completed', project.getCompletedTasks);
+app.get('/projects/:id/tasks/incomplete', project.getIncompleteTasks);
+
+// app.route('/projects/:id/tasks/:index')  //TODO pick up here
+//     .get(project.getUser)
+//     .delete(project.deleteUser)
+//     .put(project.updateUser);
+
+// /tasks routes
+app.get('/tasks', task.getTasks);
+app.get('/tasks/incomplete', task.getIncompleteTasks);
+app.get('/tasks/completed', task.getCompletedTasks);
 
 app.listen(port);
 console.log("Listening on port " + port);
