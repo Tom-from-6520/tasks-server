@@ -77,6 +77,7 @@ app.get('/projects/:id/tasks/incomplete', project.getIncompleteTasks);
 app.get('/tasks', task.getTasks);
 app.get('/tasks/incomplete', task.getIncompleteTasks);
 app.get('/tasks/completed', task.getCompletedTasks);
+app.get('/tasks/:id', task.getTask);
 
 app.listen(port);
 console.log("Listening on port " + port);
