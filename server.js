@@ -64,14 +64,14 @@ app.route('/projects/:id/users/:index')
 
 app.route('/projects/:id/tasks')
     .get(project.getTasks)
-    .post(task.createTask);
+    .post(project.createTask);
 app.get('/projects/:id/tasks/completed', project.getCompletedTasks);
 app.get('/projects/:id/tasks/incomplete', project.getIncompleteTasks);
 
-// app.route('/projects/:id/tasks/:index')  //TODO pick up here
-//     .get(project.getUser)
-//     .delete(project.deleteUser)
-//     .put(project.updateUser);
+app.route('/projects/:id/tasks/:index')
+    .get(project.getTask)
+    .delete(project.deleteTask)
+    .put(project.updateTask);  //TODO pick up here
 
 // /tasks routes
 app.get('/tasks', task.getTasks);
