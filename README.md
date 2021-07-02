@@ -23,9 +23,10 @@ After installation and modification, to test this project, enter `npm start` to 
 ## Update log
 Version 1.1 include new tests created from Postman and run by newman package. This version also eliminate the `userId` in `users` database.
 
+Version 1.2 include full features of projects, users and tasks. All of the features are tested through API tests.
+
 ## Future work
 There are some important TODOs to this project:
-- [ ] Finishing the `/projects` routes
-- [ ] Finishing the unit tests
+- [x] Finishing the API tests
 - [ ] Figuring out how to create encrypted passwords and authetications for users
 - [ ] Adding automatic Swagger
