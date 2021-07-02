@@ -1,6 +1,7 @@
 const Project = require('../models/projects.js');
 const User = require('../models/users.js');
 const Task = require('../models/tasks.js');
+const TaskHandler = require('./tasks.js');
 
 /**
  * GET /projects retrieve all the projects
@@ -34,9 +35,8 @@ function getCompletedProjects(req, res, next) {
  function createNewProject(req, res, next) {
     const newProject = new Project(req.body);
 
-    // let users = [].concat(newProject.users);
     newProject.users.forEach(projectUser => {
-        updateProject2UserDB(projectUser.userId, newProject);
+        updateUserDB(projectUser.userId, newProject);
     });
 
     newProject.save((err, project) => {
@@ -62,13 +62,13 @@ function deleteProject(req, res, next) {
     Project.findById(req.params.id, (err, project) => {
         if(err || !project)  return res.status(404).send();
 
-        let users = [].concat(project.users);
-        let taskIds = [].concat(project.taskIds);
+        const users = [].concat(project.users);
+        const taskIds = [].concat(project.taskIds);
         users.forEach(projectUser => {
-            updateProject2UserDB(projectUser.userId, project, taskIds, true);
+            updateUserDB(projectUser.userId, project, taskIds, true);
         });
         
-        Task.deleteMany({_id: project.taskIds}, (err, result) => {
+        Task.deleteMany({_id: taskIds}, (err, result) => {
             if(err)  return res.status(500).send();
             Project.deleteOne({_id: req.params.id}, (err, result) => {
                 if(err)  return res.status(500).send();
@@ -121,10 +121,9 @@ function includeUser(req, res, next) {
             if(err || !project)  return res.status(404).send();
             
             const taskIds = req.body.taskIds.filter(id => project.taskIds.includes(id));
-            //update tasks database
+            //update other database
             updateTaskDB(taskIds, project, userId);
-
-            updateProject2UserDB(userId, project, taskIds);
+            updateUserDB(userId, project, taskIds);
 
             const userIndex = project.users.findIndex(user => user.userId === userId);
             if(userIndex === -1) {
@@ -178,7 +177,7 @@ function deleteUser(req, res, next) {
         //update changes to tasks DB
         updateTaskDB(taskIds, project, userId, true);
 
-        updateProject2UserDB(userId, project, taskIds, true);
+        updateUserDB(userId, project, taskIds, true);
 
         project.users.splice(index, 1);
         project.save((err, project) => {
@@ -202,8 +201,11 @@ function updateUser(req, res, next) {
         if(req.body.taskIds) {
             req.body.taskIds = req.body.taskIds.filter(id => project.taskIds.includes(id));
             const userId = '' + project.users[index].userId;
-            const tasksToRemove = [].concat(project.users[index]);
-            const tasksToAdd = [].concat(req.body.taskIds);
+            
+            const oldTaskIds = [].concat(project.users[index]);
+            const newTaskIds = [].concat(req.body.taskIds);
+            const tasksToRemove = oldTaskIds.filter(id => !newTaskIds.includes(id));
+            const tasksToAdd = newTaskIds.filter(id => !oldTaskIds.includes(id));
             updateTaskDB(tasksToRemove, project, userId, true);
             updateTaskDB(tasksToAdd, project, userId);
         }
@@ -242,9 +244,64 @@ function getTasks(req, res, next) {
     getManyTasks(req, res);
 }
 
+function createTask(req, res, next) {
+    if(req.body.projectId)  return res.status(400).send();
+    req.body.projectId = req.params.id;
+    TaskHandler.createTask(req, res);
+}
+
+/**
+ * 
+ */
+function getTask(req, res, next) {
+    const index = parseInt(req.params.index);
+    Project.findById(req.params.id, (err, project) => {
+        if(err || !project)  return res.status(404).send();
+        if(index < 0 || index >= project.taskIds.length)  return res.status(404).send();
+        res.status(200).json(project.taskIds[index]);
+    });
+}
+
+/**
+ * PUT /projects/:id/tasks/:index
+ */
+function updateTask(req, res, next) {
+    if(req.body._id || req.body.projectId)  return res.status(400).send();
+    const index = parseInt(req.params.index);
+    Project.findById(req.params.id, (err, project) => {
+        if(err || !project)  return res.status(404).send();
+        if(index < 0 || index >= project.taskIds.length)  return res.status(404).send();
+        req.id = project.taskIds[index];
+        TaskHandler.updateTask(req, res);
+    });
+}
+
+/**
+ * DELETE /projects/:id/tasks/:index
+ */
+ function deleteTask(req, res, next) {
+    if(req.body._id || req.body.projectId)  return res.status(400).send();
+    const index = parseInt(req.params.index);
+    Project.findById(req.params.id, (err, project) => {
+        if(err || !project)  return res.status(404).send();
+        if(index < 0 || index >= project.taskIds.length)  return res.status(404).send();
+        
+        req.id = project.taskIds[index];
+        project.taskIds.splice(index, 1);
+        project.users.forEach(user => {
+            user.taskIds = user.taskIds.filter(id => id !== req.id);
+        });
+        project.save((err, project) => {
+            if(!err) {
+                TaskHandler.deleteTask(req, res);
+            }
+        });
+    });
+}
+
 module.exports = { getProjects, getCompletedProjects, getIncompleteProjects, createNewProject, getProject, deleteProject, updateProject, 
                     getUsers, includeUser, getUser, deleteUser, updateUser,
-                    getTasks, getIncompleteTasks, getCompletedTasks };
+                    getTasks, getIncompleteTasks, getCompletedTasks, createTask, getTask, updateTask, deleteTask };
 
 //helper functions
 /**
@@ -270,7 +327,7 @@ function getManyProjects(req, res) {
  * @param {[string]}        taskIds     the array of taskId for update
  * @param {boolean}         toDelete    whether the update is deletion or insertion
  */
-function updateProject2UserDB(userId, project, taskIds=[], toDelete=false) {
+function updateUserDB(userId, project, taskIds=[], toDelete=false) {
     User.findById(userId, (err, user) => {
         if(!err && user && toDelete) {
             user.projectIds = user.projectIds.filter(id => id !== project.id);
@@ -288,6 +345,13 @@ function updateProject2UserDB(userId, project, taskIds=[], toDelete=false) {
     });
 }
 
+/**
+ * Update to the Task database
+ * @param {[String]}        taskIds     the ids of the updating tasks
+ * @param {ProjectSchema}   project     the project of the updating tasks
+ * @param {String}          userId      the userId for update
+ * @param {boolean}         toDelete    whether the update is deletion or insertion
+ */
 function updateTaskDB(taskIds, project, userId, toDelete=false) {
     taskIds.forEach(taskId => {
         Task.findById(taskId, (err, task) => {
