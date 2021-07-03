@@ -4191,10 +4191,12 @@
 									"    pm.response.to.be.json;\r",
 									"});\r",
 									"\r",
-									"pm.test(\"The response is a task id\", function() {\r",
+									"pm.test(\"The response is a task\", function() {\r",
 									"    const response = pm.response.json();\r",
-									"    pm.expect(response).to.be.an(\"string\");\r",
-									"    pm.expect(response).to.be.eql(pm.collectionVariables.get(\"taskId1\"));\r",
+									"    pm.expect(response._id).to.be.eql(pm.collectionVariables.get(\"taskId1\"));\r",
+									"    pm.expect(response.name).to.be.eql(\"test server\");\r",
+									"    pm.expect(response.content).to.be.eql(\"test the weak af server\");\r",
+									"    pm.expect(response.completed).to.be.eql(false);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -5373,7 +5375,6 @@
 									"\r",
 									"pm.test(\"The response is a task\", function() {\r",
 									"    const response = pm.response.json();\r",
-									"    pm.expect(response).to.be.an(\"object\");\r",
 									"    pm.expect(response._id).to.be.eql(pm.collectionVariables.get(\"taskId1\"));\r",
 									"    pm.expect(response.name).to.be.eql(\"test server\");\r",
 									"    pm.expect(response.content).to.be.eql(\"test the weak af server\");\r",
