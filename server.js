@@ -71,7 +71,7 @@ app.get('/projects/:id/tasks/incomplete', project.getIncompleteTasks);
 app.route('/projects/:id/tasks/:index')
     .get(project.getTask)
     .delete(project.deleteTask)
-    .put(project.updateTask);  //TODO pick up here
+    .put(project.updateTask);
 
 // /tasks routes
 app.get('/tasks', task.getTasks);
