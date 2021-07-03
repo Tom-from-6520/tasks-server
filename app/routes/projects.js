@@ -258,7 +258,7 @@ function getTask(req, res, next) {
     Project.findById(req.params.id, (err, project) => {
         if(err || !project)  return res.status(404).send();
         if(index < 0 || index >= project.taskIds.length)  return res.status(404).send();
-        res.status(200).json(project.taskIds[index]);
+        res.redirect('/tasks/' + project.taskIds[index]);
     });
 }
 
